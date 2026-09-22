@@ -14,6 +14,7 @@ pages = {
         st.Page("app_pages/dashboard.py", title="Dashboard", icon=":material/dashboard:"),
         st.Page("app_pages/accounts.py", title="Contas", icon=":material/account_balance:"),
         st.Page("app_pages/transactions.py", title="Movimentações", icon=":material/payments:"),
+        st.Page("app_pages/transfers.py", title="Transferências", icon=":material/swap_horiz:"),
         st.Page("app_pages/categories.py", title="Categorias", icon=":material/category:"),
         st.Page("app_pages/cards.py", title="Cartões de crédito", icon=":material/credit_card:"),
         st.Page("app_pages/purchases.py", title="Compras no cartão", icon=":material/shopping_cart:"),
