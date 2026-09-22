@@ -14,6 +14,7 @@ from .database import DEFAULT_DATABASE_PATH, get_connection, initialize_database
 BACKUP_DIR = DEFAULT_DATABASE_PATH.parent.parent / "backups"
 REQUIRED_TABLES = {"accounts", "categories", "transactions"}
 ALL_DATA_TABLES = (
+    "transfers",
     "recurring_occurrences",
     "recurring_expenses",
     "import_records",

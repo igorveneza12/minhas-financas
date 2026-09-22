@@ -88,7 +88,11 @@ def list_accounts(
                 a.account_type,
                 a.active,
                 a.initial_balance_cents,
-                COUNT(t.id) AS transaction_count,
+                COUNT(t.id) + (
+                    SELECT COUNT(*)
+                    FROM transfers AS tr
+                    WHERE tr.source_account_id = a.id OR tr.destination_account_id = a.id
+                ) AS transaction_count,
                 a.initial_balance_cents
                 + COALESCE((
                     SELECT SUM(CASE
@@ -97,6 +101,14 @@ def list_accounts(
                         ELSE 0
                     END)
                     FROM transactions AS t WHERE t.account_id = a.id
+                ), 0)
+                - COALESCE((
+                    SELECT SUM(tr.amount_cents)
+                    FROM transfers AS tr WHERE tr.source_account_id = a.id
+                ), 0)
+                + COALESCE((
+                    SELECT SUM(tr.amount_cents)
+                    FROM transfers AS tr WHERE tr.destination_account_id = a.id
                 ), 0)
                 - COALESCE((
                     SELECT SUM(p.amount_cents)
@@ -117,8 +129,12 @@ def list_accounts(
 
 def _account_transaction_count(connection: sqlite3.Connection, account_id: int) -> int:
     row = connection.execute(
-        "SELECT COUNT(*) AS total FROM transactions WHERE account_id = ?",
-        (account_id,),
+        """SELECT
+               (SELECT COUNT(*) FROM transactions WHERE account_id = ?)
+               +
+               (SELECT COUNT(*) FROM transfers
+                WHERE source_account_id = ? OR destination_account_id = ?) AS total""",
+        (account_id, account_id, account_id),
     ).fetchone()
     return int(row["total"])
 
