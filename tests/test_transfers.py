@@ -46,3 +46,19 @@ def test_transfer_validation_and_delete(database):
     delete_transfer(created, database)
     assert not list_transfers(database)
     assert total_balance_cents(database) == 100_000
+
+
+def test_account_with_transfer_cannot_be_deleted(database):
+    from src.accounts import delete_account
+
+    source = create_account("Origem", "conta_corrente", 1_000, database)
+    target = create_account("Destino", "conta_corrente", 0, database)
+    create_transfer(source, target, 100, "2026-01-01", database_path=database)
+
+    rows = {row["name"]: row for row in list_accounts(database)}
+    assert rows["Origem"]["transaction_count"] == 1
+    assert rows["Destino"]["transaction_count"] == 1
+    with pytest.raises(ValueError):
+        delete_account(source, database)
+    with pytest.raises(ValueError):
+        delete_account(target, database)
