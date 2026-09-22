@@ -99,6 +99,14 @@ def list_accounts(
                     FROM transactions AS t WHERE t.account_id = a.id
                 ), 0)
                 - COALESCE((
+                    SELECT SUM(tr.amount_cents)
+                    FROM transfers AS tr WHERE tr.source_account_id = a.id
+                ), 0)
+                + COALESCE((
+                    SELECT SUM(tr.amount_cents)
+                    FROM transfers AS tr WHERE tr.destination_account_id = a.id
+                ), 0)
+                - COALESCE((
                     SELECT SUM(p.amount_cents)
                     FROM card_payments AS p WHERE p.account_id = a.id
                 ), 0)
