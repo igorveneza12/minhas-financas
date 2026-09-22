@@ -17,6 +17,19 @@ CREATE TABLE IF NOT EXISTS accounts (
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS transfers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_account_id INTEGER NOT NULL,
+    destination_account_id INTEGER NOT NULL,
+    amount_cents INTEGER NOT NULL CHECK (amount_cents > 0),
+    transfer_date TEXT NOT NULL,
+    notes TEXT,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CHECK (source_account_id <> destination_account_id),
+    FOREIGN KEY (source_account_id) REFERENCES accounts (id),
+    FOREIGN KEY (destination_account_id) REFERENCES accounts (id)
+);
+
 CREATE TABLE IF NOT EXISTS categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL CHECK (length(trim(name)) > 0),
